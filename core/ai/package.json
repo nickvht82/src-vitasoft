@@ -11,7 +11,7 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
+    "@anthropic-ai/sdk": "^0.110.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

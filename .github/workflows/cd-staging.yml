@@ -1,0 +1,65 @@
+# CD staging: merge vào main → build Docker → push Artifact Registry → deploy GKE.
+# Kích hoạt khi: (1) GCP đã bootstrap qua Terraform, (2) app có Dockerfile,
+# (3) repo variable DEPLOY_ENABLED = 'true'. Trước đó workflow tự skip — vô hại.
+name: CD Staging
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".claude/**"
+      - "infra/terraform/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cd-staging
+  cancel-in-progress: false # không huỷ deploy đang chạy giữa chừng
+
+jobs:
+  deploy:
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    strategy:
+      matrix:
+        app: [api, homepage, admin] # app chưa có Dockerfile sẽ được bỏ qua ở step build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Dockerfile exists
+        id: dockerfile
+        run: |
+          APP_DIR=$([ "${{ matrix.app }}" = "homepage" ] && echo "vitasoft-homepage" || echo "${{ matrix.app }}")
+          echo "dir=$APP_DIR" >> "$GITHUB_OUTPUT"
+          if [ -f "$APP_DIR/Dockerfile" ]; then echo "exists=true" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: google-github-actions/auth@v2
+        if: steps.dockerfile.outputs.exists == 'true'
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+
+      - name: Configure Docker for Artifact Registry
+        if: steps.dockerfile.outputs.exists == 'true'
+        run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & push image
+        if: steps.dockerfile.outputs.exists == 'true'
+        run: |
+          IMAGE="${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/vitasoft/${{ matrix.app }}"
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:staging" "${{ steps.dockerfile.outputs.dir }}"
+          docker push "$IMAGE" --all-tags
+
+      - name: Deploy to GKE staging
+        if: steps.dockerfile.outputs.exists == 'true'
+        run: |
+          gcloud container clusters get-credentials vitasoft-staging --region ${{ vars.GCP_REGION }}
+          cd infra/k8s/overlays/staging
+          kustomize edit set image "${{ matrix.app }}=${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/vitasoft/${{ matrix.app }}:${{ github.sha }}"
+          kubectl apply -k .
+          kubectl rollout status deployment/${{ matrix.app }} -n vitasoft-staging --timeout=180s

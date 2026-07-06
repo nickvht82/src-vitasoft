@@ -1,0 +1,68 @@
+# Validate Terraform trên mọi PR chạm infra/terraform.
+# Plan/apply thật chạy khi GCP đã bootstrap (repo variables được set — xem infra/README.md).
+name: Terraform
+
+on:
+  pull_request:
+    paths: ["infra/terraform/**"]
+  push:
+    branches: [main]
+    paths: ["infra/terraform/**"]
+
+permissions:
+  contents: read
+  id-token: write # Workload Identity Federation
+
+defaults:
+  run:
+    working-directory: infra/terraform
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Init (no backend) & validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  plan-staging:
+    # Chỉ chạy khi hạ tầng GCP đã bootstrap (variables set trong repo Settings).
+    if: vars.GCP_PROJECT_ID != ''
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform plan (staging)
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="prefix=vitasoft/staging"
+          terraform plan \
+            -var-file=environments/staging.tfvars \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -input=false
+
+      - name: Terraform apply (chỉ trên main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          terraform apply \
+            -var-file=environments/staging.tfvars \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -input=false -auto-approve

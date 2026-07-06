@@ -13,7 +13,12 @@ package core mới, hoặc scaffold MVP từ idea brief.
 
 ## Nguyên tắc làm việc
 
-- Dùng skill `product-build` — chứa quy ước monorepo bắt buộc.
+- Dùng skill `product-build` (quy ước monorepo) + `quality-standards` (dependency EOL,
+  bảo mật, coverage 90%, Playwright, Docker) — cả hai đều bắt buộc.
+- Thêm dependency mới: kiểm tra vòng đời/EOL theo `quality-standards` mục 1 trước;
+  lựa chọn framework lớn phải có research report từ `research-analyst`.
+- Module mới phải kèm unit tests đạt coverage ≥90% (Vitest) và Playwright E2E cho
+  user flow quan trọng.
 - **Mọi tính năng AI phải đi qua `@vitasoft/ai`** — không import `@anthropic-ai/sdk` trực tiếp.
 - TypeScript strict; package mới extend `tsconfig.base.json` và đăng ký vào `pnpm-workspace.yaml`.
 - Làm đúng scope được giao — không refactor/thêm abstraction ngoài yêu cầu.

@@ -1,15 +1,15 @@
 ---
 name: vitasoft-dev
-description: Orchestrator cho mọi công việc phát triển sản phẩm Vitasoft — brainstorm ý tưởng, xây tính năng/MVP, QA chất lượng. Dùng khi user yêu cầu xây/thêm/sửa tính năng, tạo sản phẩm mới, phát triển ý tưởng, hoặc các yêu cầu tiếp nối như "làm tiếp", "chạy lại", "cập nhật", "cải thiện", "sửa lại phần X", "build tiếp Mind", "thêm tính năng cho homepage". Câu hỏi thuần túy (không tạo/sửa gì) có thể trả lời trực tiếp không cần skill này.
+description: Orchestrator cho mọi công việc phát triển sản phẩm Vitasoft — brainstorm ý tưởng, deep research công nghệ/giải pháp, xây tính năng/MVP, QA chất lượng. Dùng khi user yêu cầu xây/thêm/sửa tính năng, tạo sản phẩm mới, phát triển ý tưởng, nghiên cứu/so sánh công nghệ, hoặc các yêu cầu tiếp nối như "làm tiếp", "chạy lại", "cập nhật", "cải thiện", "sửa lại phần X", "build tiếp Mind", "thêm tính năng cho homepage", "research giải pháp Y". Câu hỏi thuần túy (không tạo/sửa gì) có thể trả lời trực tiếp không cần skill này.
 ---
 
 # Vitasoft Dev — Orchestrator
 
-Điều phối 3 agents (định nghĩa tại `.claude/agents/`): `product-strategist`,
-`builder`, `qa-reviewer`. Mọi Agent call dùng `model: "opus"`.
+Điều phối 4 agents (định nghĩa tại `.claude/agents/`): `product-strategist`,
+`research-analyst`, `builder`, `qa-reviewer`. Mọi Agent call dùng `model: "opus"`.
 
 **Chế độ thực thi: Hybrid**
-- **Phase Ý tưởng** — sub-agent đơn lẻ (chỉ cần kết quả, không cần giao tiếp nhóm)
+- **Phase Ý tưởng / Research** — sub-agent đơn lẻ (chỉ cần kết quả, không cần giao tiếp nhóm)
 - **Phase Xây dựng + QA** — agent team (builder ↔ qa-reviewer trao đổi trực tiếp, incremental QA)
 
 ## Phase 0 — Xác định bối cảnh
@@ -32,6 +32,15 @@ Yêu cầu chỉ liên quan 1 giai đoạn (VD: "brainstorm ý tưởng X") → 
 1. Gọi Agent(`product-strategist`, model opus) với mô tả ý tưởng từ user.
 2. Output: `ideas/<slug>/README.md`.
 3. Trình brief cho user duyệt — **chỉ tiếp tục Phase 2 khi user đồng ý xây MVP**.
+
+## Phase 1b — Deep Research (khi cần chọn công nghệ / thẩm định giải pháp)
+
+**Chế độ:** sub-agent.
+
+1. Gọi Agent(`research-analyst`, model opus) với câu hỏi nghiên cứu rõ ràng.
+2. Output: `docs/research/<YYYY-MM-DD>-<slug>.md` (ma trận so sánh + khuyến nghị + EOL check).
+3. Kích hoạt khi: brief đề xuất stack mới, builder gặp lựa chọn thư viện lớn, hoặc user
+   yêu cầu research trực tiếp. Quyết định công nghệ lớn **không được** bỏ qua bước này.
 
 ## Phase 2 — Xây dựng + QA (khi có yêu cầu build)
 

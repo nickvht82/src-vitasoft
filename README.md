@@ -17,7 +17,7 @@ pnpm build
 pnpm --filter @vitasoft/homepage dev
 ```
 
-Yêu cầu: Node.js 20+, pnpm 9+.
+Yêu cầu: Node.js 22+ (LTS), pnpm 9+.
 
 ## Tài liệu
 

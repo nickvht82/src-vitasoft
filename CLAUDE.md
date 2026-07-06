@@ -28,7 +28,7 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 
 ## Conventions
 
-- **Package manager:** pnpm workspaces + Turborepo. Node 20+.
+- **Package manager:** pnpm workspaces + Turborepo. Node 22+ (LTS — theo chính sách không-EOL trong skill `quality-standards`).
 - **TypeScript strict** everywhere; packages extend `tsconfig.base.json`.
 - **AI:** never import `@anthropic-ai/sdk` directly in products — use `@vitasoft/ai`
   (consistent model IDs, adaptive thinking, streaming helpers).
@@ -46,6 +46,8 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 | Ngày | Thay đổi | Đối tượng | Lý do |
 |------|----------|----------|-------|
 | 2026-07-06 | Khởi tạo harness: 3 agents (product-strategist, builder, qa-reviewer) + 4 skills (vitasoft-dev, idea-incubation, product-build, qa-verification) | Toàn bộ | - |
+| 2026-07-06 | Thêm agent research-analyst + skills deep-research, quality-standards; builder/qa-reviewer tham chiếu quality-standards; orchestrator thêm Phase 1b Research | agents/, skills/ | Yêu cầu deep research + tiêu chuẩn chất lượng enterprise |
+| 2026-07-06 | Node 20→22 (Node 20 EOL 04/2026), thêm Dependabot + auto-merge patch/minor, pnpm audit trong CI | package.json, .github/ | Chính sách dependency không-EOL |
 
 ## Roadmap
 

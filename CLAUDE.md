@@ -36,6 +36,17 @@ pnpm --filter @vitasoft/homepage dev   # run one product
   Secret Manager.
 - **Branches:** feature branches → PR → `main`. CI (typecheck/build/test) must pass.
 
+## Hài hòa (Harness): Vitasoft Product Development
+
+**Mục tiêu:** Brainstorm ý tưởng mới và đảm bảo chất lượng khi AI xây dựng sản phẩm Vitasoft.
+
+**Trigger:** Khi có yêu cầu phát triển sản phẩm (brainstorm ý tưởng, xây/sửa tính năng, tạo MVP, QA), dùng skill `vitasoft-dev`. Câu hỏi thuần túy trả lời trực tiếp được.
+
+**Biến đổi (Change log):**
+| Ngày | Thay đổi | Đối tượng | Lý do |
+|------|----------|----------|-------|
+| 2026-07-06 | Khởi tạo harness: 3 agents (product-strategist, builder, qa-reviewer) + 4 skills (vitasoft-dev, idea-incubation, product-build, qa-verification) | Toàn bộ | - |
+
 ## Roadmap
 
 Phase 1 (done): monorepo foundation, core packages, homepage skeleton, CI.

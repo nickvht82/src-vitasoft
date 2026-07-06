@@ -1,0 +1,39 @@
+// Vitasoft shared Prisma schema.
+// Source of truth for the relational data model used by @vitasoft/api and
+// every product backend. Multi-tenancy is modelled with `organizationId` as
+// the tenant key on business tables (see ARCHITECTURE.md §5.2).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A tenant. Every business record hangs off exactly one organization.
+model Organization {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  users User[]
+
+  @@map("organizations")
+}
+
+/// Minimal user model — the tenant key `organizationId` is present from day one
+/// so multi-tenant scoping works before the auth module lands (increment 2).
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  organizationId String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("users")
+}

@@ -1,0 +1,58 @@
+# Local dev stack for Docker Desktop: core API + Postgres + Redis.
+#   docker compose up
+# Env comes from .env at the repo root (copy from api/.env.example).
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vitasoft}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vitasoft}
+      POSTGRES_DB: ${POSTGRES_DB:-vitasoft}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vitasoft} -d ${POSTGRES_DB:-vitasoft}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: api
+      PORT: "3001"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vitasoft}:${POSTGRES_PASSWORD:-vitasoft}@postgres:5432/${POSTGRES_DB:-vitasoft}?schema=public
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3001/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  pgdata:

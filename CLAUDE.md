@@ -52,6 +52,7 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 | 2026-07-06 | Node 20→22 (Node 20 EOL 04/2026), thêm Dependabot + auto-merge patch/minor, pnpm audit trong CI | package.json, .github/ | Chính sách dependency không-EOL |
 | 2026-07-06 | Node 22→24 (22 đã vào Maintenance); thêm quality-standards mục 7 (convention + code docs) & mục 8 (best practices/principles); qa-reviewer thêm gate convention | skills/quality-standards, agents/qa-reviewer, package.json, ci.yml | Feedback founder: siết quality gate |
 | 2026-07-06 | Scaffold module admin/ (Next 16 + antd 6.5, port 3100); quy tắc UI: Ant Design chỉ cho admin, Tailwind+shadcn cho frontend sản phẩm | admin/, skills/product-build, pnpm-workspace | Quyết định founder: Ant Design cho Admin Web |
+| 2026-07-06 | Phase 2a inc.1: scaffold backend core API `api/` (NestJS 11 + Fastify, Clean Architecture/Hexagonal + CQRS + Repository + DI, port 3001, prefix /v1); module mẫu `organizations`; core packages `@vitasoft/database` (Prisma 7 + pg adapter) và `@vitasoft/http-kit` (RFC 7807 filter, ZodValidationPipe, LoggingInterceptor); health @nestjs/terminus; Swagger /docs; Dockerfile + docker-compose (postgres:17, redis:7); 51 tests, coverage ≥90% | api/, core/database, core/http-kit, docker-compose.yml, pnpm-workspace | Roadmap Phase 2a — nền backend cho mọi sản phẩm |
 
 ## Roadmap
 

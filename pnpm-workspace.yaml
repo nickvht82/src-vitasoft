@@ -1,0 +1,6 @@
+packages:
+  - "core/*"
+  - "vitasoft-homepage"
+  - "mind"
+  - "marketing"
+  - "ideas/*"

@@ -9,9 +9,10 @@ description: Bộ tiêu chuẩn chất lượng enterprise bắt buộc của Vi
 
 Chạy phần mềm trên nền tảng hết hỗ trợ = không có bản vá bảo mật = lỗ hổng tích lũy.
 
-- **Runtime:** chỉ dùng Node.js phiên bản **Active/Maintenance LTS** còn hỗ trợ ≥12 tháng.
-  Tra endoflife.date/nodejs trước khi chọn. (Node 20 EOL 04/2026 — repo này dùng Node 22 LTS,
-  EOL 04/2027; lên kế hoạch chuyển Node 24 trước Q1/2027.)
+- **Runtime:** chỉ dùng Node.js phiên bản **Active LTS** (không dùng bản đã rơi xuống
+  Maintenance — chỉ nhận security patch, không nhận bug fix). Tra endoflife.date/nodejs
+  trước khi chọn. (Hiện tại: **Node 24** — Active LTS, EOL 04/2028. Node 22 đã chuyển
+  Maintenance từ 10/2025 nên không dùng cho code mới.)
 - **Thư viện mới:** trước khi thêm, kiểm tra: commit cuối <6 tháng, có maintainer hoạt động,
   không có CVE nghiêm trọng chưa vá. Thư viện bỏ hoang >12 tháng → tìm thay thế.
 - **Major version:** nâng cấp trong vòng 6 tháng sau khi major mới ra ổn định — càng chờ
@@ -69,7 +70,44 @@ kể cả output của Claude phải validate trước khi dùng làm câu lện
   Grafana/monitoring MCP khi Phase 4.
 - Nguyên tắc: thao tác lặp lại qua UI ≥3 lần/tuần → tìm/cấu hình MCP server cho nó.
 
-## 7. Framework hiện đại, dễ scale & upgrade
+## 7. Convention & code documentation chuẩn
+
+Code được đọc nhiều gấp 10 lần được viết — convention nhất quán và tài liệu đúng chỗ
+giảm chi phí đọc cho cả người và AI agent.
+
+- **Naming:** `camelCase` biến/hàm, `PascalCase` type/class/component, `kebab-case` tên file,
+  `SCREAMING_SNAKE_CASE` hằng số. Tên nói rõ ý định (`remainingRetries` chứ không `n`).
+- **TSDoc bắt buộc** cho mọi export public của package `core/`: mô tả 1 câu làm gì,
+  `@param`/`@returns` khi không tự hiển nhiên, `@example` cho API phức tạp. Code nội bộ
+  không export: chỉ comment khi giải thích **why** (ràng buộc, trade-off) — không comment
+  kể lại **what** (dòng code đã tự nói).
+- **ESLint + Prettier** là luật, không phải gợi ý: CI fail khi lint fail. Không tắt rule
+  bằng `eslint-disable` mà không có comment giải thích lý do ngay cạnh.
+- **Cấu trúc module nhất quán:** mỗi package/module theo cùng layout (src/, index.ts là
+  public surface duy nhất, không import sâu vào file nội bộ của package khác).
+- **README mỗi package:** mục đích, cách dùng 5 dòng, và những gì KHÔNG thuộc phạm vi.
+
+## 8. Best practices & principles chuyên nghiệp
+
+Nguyên tắc áp dụng khi viết và khi review — QA reviewer dùng làm checklist:
+
+- **SOLID có chọn lọc:** Single Responsibility (một module một lý do để đổi) và
+  Dependency Inversion (phụ thuộc interface, không phụ thuộc implementation) là bắt buộc;
+  các nguyên tắc còn lại áp dụng khi hợp ngữ cảnh, không cuồng tín.
+- **KISS > DRY > YAGNI theo thứ tự đó:** đơn giản trước; trùng lặp 2 lần chấp nhận được,
+  lần 3 mới trừu tượng hoá; không xây cho nhu cầu tương lai giả định.
+- **Fail fast, error rõ ràng:** validate input tại boundary rồi tin tưởng bên trong;
+  error message nói rõ cái gì sai và cách sửa; không nuốt exception âm thầm.
+- **Immutability mặc định:** `const`, `readonly`, không mutate tham số; state thay đổi
+  được phải là quyết định có chủ đích.
+- **Hàm nhỏ, thuần khi có thể:** side effect dồn ra rìa (I/O, DB), logic giữa là pure
+  function — dễ test, dễ đạt coverage 90% thật.
+- **Không magic:** số/chuỗi lặp lại có ý nghĩa → hằng số có tên; hành vi phụ thuộc config
+  → khai báo trong `@vitasoft/config` schema, không đọc `process.env` rải rác.
+- **Review chuẩn:** mọi thay đổi qua PR; PR nhỏ (<400 dòng thay đổi) để review chất lượng;
+  commit message mô tả why.
+
+## 9. Framework hiện đại, dễ scale & upgrade
 
 - Ưu tiên framework có: upgrade path chính thức (codemods), release cadence ổn định,
   backward-compat policy rõ ràng. Hiện tại: Next.js (App Router), NestJS cho backend

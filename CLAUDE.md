@@ -28,7 +28,8 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 
 ## Conventions
 
-- **Package manager:** pnpm workspaces + Turborepo. Node 22+ (LTS — theo chính sách không-EOL trong skill `quality-standards`).
+- **Package manager:** pnpm workspaces + Turborepo. Node 24+ (Active LTS — theo chính sách không-EOL trong skill `quality-standards`: không dùng bản Maintenance cho code mới).
+- **Convention & principles:** mọi code tuân thủ quality-standards mục 7 (naming, TSDoc cho export public core/, ESLint/Prettier là luật) và mục 8 (SOLID chọn lọc, KISS>DRY>YAGNI, fail-fast, immutability mặc định).
 - **TypeScript strict** everywhere; packages extend `tsconfig.base.json`.
 - **AI:** never import `@anthropic-ai/sdk` directly in products — use `@vitasoft/ai`
   (consistent model IDs, adaptive thinking, streaming helpers).
@@ -48,6 +49,7 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 | 2026-07-06 | Khởi tạo harness: 3 agents (product-strategist, builder, qa-reviewer) + 4 skills (vitasoft-dev, idea-incubation, product-build, qa-verification) | Toàn bộ | - |
 | 2026-07-06 | Thêm agent research-analyst + skills deep-research, quality-standards; builder/qa-reviewer tham chiếu quality-standards; orchestrator thêm Phase 1b Research | agents/, skills/ | Yêu cầu deep research + tiêu chuẩn chất lượng enterprise |
 | 2026-07-06 | Node 20→22 (Node 20 EOL 04/2026), thêm Dependabot + auto-merge patch/minor, pnpm audit trong CI | package.json, .github/ | Chính sách dependency không-EOL |
+| 2026-07-06 | Node 22→24 (22 đã vào Maintenance); thêm quality-standards mục 7 (convention + code docs) & mục 8 (best practices/principles); qa-reviewer thêm gate convention | skills/quality-standards, agents/qa-reviewer, package.json, ci.yml | Feedback founder: siết quality gate |
 
 ## Roadmap
 

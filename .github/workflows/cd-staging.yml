@@ -29,7 +29,7 @@ jobs:
       matrix:
         app: [api, homepage, admin] # app chưa có Dockerfile sẽ được bỏ qua ở step build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Check Dockerfile exists
         id: dockerfile

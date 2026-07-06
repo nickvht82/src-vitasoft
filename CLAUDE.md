@@ -10,6 +10,7 @@ core packages under `core/`.
 | `core/config` | `@vitasoft/config` | Type-safe env config (zod), fail-fast validation |
 | `core/logger` | `@vitasoft/logger` | Structured JSON logging (pino) for Cloud Logging |
 | `core/ai` | `@vitasoft/ai` | Shared Claude client — all AI features go through this |
+| `admin` | `@vitasoft/admin` | Back-office console (Next.js + Ant Design, port 3100, noindex) |
 | `vitasoft-homepage` | `@vitasoft/homepage` | Main landing site (Next.js) linking all products |
 | `mind` | `@vitasoft/mind` | Math learning platform (mind.vitasoft.io) — Phase 3 |
 | `marketing` | `@vitasoft/marketing` | Marketing automation — later phase |
@@ -50,6 +51,7 @@ pnpm --filter @vitasoft/homepage dev   # run one product
 | 2026-07-06 | Thêm agent research-analyst + skills deep-research, quality-standards; builder/qa-reviewer tham chiếu quality-standards; orchestrator thêm Phase 1b Research | agents/, skills/ | Yêu cầu deep research + tiêu chuẩn chất lượng enterprise |
 | 2026-07-06 | Node 20→22 (Node 20 EOL 04/2026), thêm Dependabot + auto-merge patch/minor, pnpm audit trong CI | package.json, .github/ | Chính sách dependency không-EOL |
 | 2026-07-06 | Node 22→24 (22 đã vào Maintenance); thêm quality-standards mục 7 (convention + code docs) & mục 8 (best practices/principles); qa-reviewer thêm gate convention | skills/quality-standards, agents/qa-reviewer, package.json, ci.yml | Feedback founder: siết quality gate |
+| 2026-07-06 | Scaffold module admin/ (Next 16 + antd 6.5, port 3100); quy tắc UI: Ant Design chỉ cho admin, Tailwind+shadcn cho frontend sản phẩm | admin/, skills/product-build, pnpm-workspace | Quyết định founder: Ant Design cho Admin Web |
 
 ## Roadmap
 

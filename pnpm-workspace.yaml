@@ -1,5 +1,6 @@
 packages:
   - "core/*"
+  - "admin"
   - "vitasoft-homepage"
   - "mind"
   - "marketing"

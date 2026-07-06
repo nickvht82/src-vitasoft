@@ -11,9 +11,18 @@ description: Quy ước bắt buộc khi viết code trong monorepo vitasoft —
 |---|---|---|
 | Logic dùng chung ≥2 sản phẩm | `core/<package>/` | Tạo package mới nếu chưa có chỗ hợp lý |
 | Tính năng homepage | `vitasoft-homepage/src/` | Next.js App Router |
+| Admin console (back-office) | `admin/src/` | Next.js + **Ant Design** — xem quy tắc UI dưới |
 | Sản phẩm Mind | `mind/` | |
 | Marketing tools | `marketing/` | |
 | Thử nghiệm ý tưởng | `ideas/<slug>/` | Chỉ prototype, không cần production-grade |
+
+## Quy tắc UI framework
+
+- **Frontend sản phẩm** (homepage, mind, marketing, ideas): Tailwind + shadcn/ui.
+- **Admin console (`admin/`) — và CHỈ admin console**: Ant Design (antd 6) — quyết định
+  founder, vì admin cần bộ component data-heavy (Table, Form phức tạp) có sẵn.
+- Không trộn hai hệ UI trong cùng một app; component dùng chung giữa hai hệ đặt ở
+  mức logic (hooks, utils trong `core/`), không phải mức UI.
 
 ## Package mới trong core/
 

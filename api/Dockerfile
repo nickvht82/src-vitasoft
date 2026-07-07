@@ -17,14 +17,14 @@ COPY core ./core
 COPY api ./api
 RUN pnpm install --frozen-lockfile
 
-# ---- build: generate Prisma client + compile all needed packages ----
+# ---- build: compile @vitasoft/api and all its workspace deps ----
+# "@vitasoft/api..." selects the api plus every package it depends on, and
+# pnpm runs the build scripts in topological order (deps first). This stays
+# correct when new core/* packages are added as api dependencies — no need
+# to maintain an explicit per-package build list here.
 FROM deps AS build
 WORKDIR /repo
-RUN pnpm --filter @vitasoft/database run build \
- && pnpm --filter @vitasoft/logger run build \
- && pnpm --filter @vitasoft/config run build \
- && pnpm --filter @vitasoft/http-kit run build \
- && pnpm --filter @vitasoft/api run build \
+RUN pnpm --filter "@vitasoft/api..." run build \
  && pnpm deploy --filter=@vitasoft/api --prod /app
 
 # ---- runtime: slim, non-root, ESM entrypoint ----

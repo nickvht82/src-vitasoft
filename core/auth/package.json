@@ -1,0 +1,39 @@
+{
+  "name": "@vitasoft/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vitasoft/database": "workspace:*",
+    "better-auth": "1.6.23"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "reflect-metadata": "^0.2.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "reflect-metadata": "0.2.2",
+    "typescript": "^5.7.2",
+    "unplugin-swc": "1.5.9",
+    "@swc/core": "1.15.43",
+    "vitest": "4.1.10"
+  }
+}

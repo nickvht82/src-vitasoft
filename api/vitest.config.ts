@@ -22,6 +22,9 @@ export default defineConfig({
         "src/**/*.module.ts",
         "src/**/*.{test,spec}.ts",
         "src/**/index.ts",
+        // Infrastructure that opens a live Redis connection + runs a worker —
+        // exercised by the P4 smoke test against real Redis, not unit tests.
+        "src/modules/jobs/ai-tasks.queue.ts",
       ],
       thresholds: { lines: 90, functions: 90, branches: 85 },
     },

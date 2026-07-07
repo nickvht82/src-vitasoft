@@ -12,6 +12,20 @@ export {
   getPrismaClient,
   PrismaClient,
   type PrismaClientOptions,
+  type Account,
+  type Invitation,
+  type Member,
   type Organization,
+  type Session,
   type User,
+  type Verification,
 } from "./client.js";
+
+export {
+  createTenantScopeExtension,
+  withTenantScope,
+  TENANT_MODELS,
+  TENANT_KEY,
+  type TenantIdProvider,
+  type TenantScopeExtension,
+} from "./tenant-scope.js";

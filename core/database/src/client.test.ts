@@ -25,34 +25,32 @@ describe("createPrismaClient", () => {
     expect(a).not.toBe(b);
   });
 
-  it("falls back to process.env.DATABASE_URL when no url is passed", () => {
+  it("does NOT read process.env — an unpassed url fails fast (F-01)", () => {
+    // Even with a valid DATABASE_URL in the environment, the factory must not
+    // reach into process.env: config validation is the single boundary.
     const previous = process.env.DATABASE_URL;
     process.env.DATABASE_URL = "postgresql://u:p@localhost:5432/env";
     try {
-      const client = createPrismaClient();
-      expect(typeof client.$connect).toBe("function");
+      expect(() =>
+        createPrismaClient({ datasourceUrl: "" }),
+      ).toThrow(/non-empty datasourceUrl/);
     } finally {
       if (previous === undefined) delete process.env.DATABASE_URL;
       else process.env.DATABASE_URL = previous;
     }
   });
 
-  it("tolerates a missing url (empty-string fallback) so codegen/boot never crash", () => {
-    const previous = process.env.DATABASE_URL;
-    delete process.env.DATABASE_URL;
-    try {
-      const client = createPrismaClient({ log: ["query"] });
-      expect(typeof client.$connect).toBe("function");
-    } finally {
-      if (previous !== undefined) process.env.DATABASE_URL = previous;
-    }
+  it("throws on an empty datasourceUrl instead of building a dead client (F-01)", () => {
+    expect(() =>
+      createPrismaClient({ datasourceUrl: "", log: ["query"] }),
+    ).toThrow(/non-empty datasourceUrl/);
   });
 });
 
 describe("getPrismaClient", () => {
   it("caches a single instance across calls (one connection pool per process)", () => {
     const first = getPrismaClient({ datasourceUrl: "postgresql://u:p@localhost:5432/db" });
-    const second = getPrismaClient();
+    const second = getPrismaClient({ datasourceUrl: "postgresql://u:p@localhost:5432/ignored" });
     expect(second).toBe(first);
   });
 

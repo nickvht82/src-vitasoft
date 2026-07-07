@@ -1,6 +1,7 @@
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 import { Test, type TestingModule } from "@nestjs/testing";
+import { AUTH_INSTANCE } from "@vitasoft/auth";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CreateOrganizationHandler } from "../application/commands/create-organization.handler.js";
 import { GetOrganizationHandler } from "../application/queries/get-organization.handler.js";
@@ -30,6 +31,10 @@ describe("OrganizationsController (integration)", () => {
           provide: ORGANIZATION_REPOSITORY,
           useClass: InMemoryOrganizationRepository,
         },
+        // AuthGuard (on POST) needs AUTH_INSTANCE resolvable at compile time.
+        // These tests call controller methods directly, so the guard never runs
+        // — a stub is enough to satisfy the DI graph.
+        { provide: AUTH_INSTANCE, useValue: {} },
       ],
     }).compile();
 

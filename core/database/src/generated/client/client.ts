@@ -44,11 +44,42 @@ export { Prisma }
 /**
  * Model Organization
  * A tenant. Every business record hangs off exactly one organization.
+ * Also serves as better-auth's `organization` table (org plugin): `slug`,
+ * `name`, `logo`, `metadata` are the fields better-auth expects.
  */
 export type Organization = Prisma.OrganizationModel
 /**
  * Model User
- * Minimal user model — the tenant key `organizationId` is present from day one
- * so multi-tenant scoping works before the auth module lands (increment 2).
+ * Application user (better-auth canonical `user` fields). `organizationId` is
+ * the user's home tenant — **nullable** because better-auth creates the user at
+ * sign-up, before any organization exists; it is set when the user creates or
+ * joins their first org. Membership + roles live in the `Member` join table.
  */
 export type User = Prisma.UserModel
+/**
+ * Model Session
+ * better-auth session. Cookie-backed, validated server-side on every request.
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model Account
+ * better-auth account — holds the password hash for email/password auth and
+ * (later) OAuth provider linkages.
+ */
+export type Account = Prisma.AccountModel
+/**
+ * Model Verification
+ * better-auth verification tokens (email verification, password reset).
+ */
+export type Verification = Prisma.VerificationModel
+/**
+ * Model Member
+ * better-auth organization plugin: a user's membership + role in an org.
+ * `role` is one of the Vitasoft roles (admin | operator | member).
+ */
+export type Member = Prisma.MemberModel
+/**
+ * Model Invitation
+ * better-auth organization plugin: a pending invitation to join an org.
+ */
+export type Invitation = Prisma.InvitationModel

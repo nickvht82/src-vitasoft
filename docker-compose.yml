@@ -40,6 +40,8 @@ services:
       PORT: "3001"
       DATABASE_URL: postgresql://${POSTGRES_USER:-vitasoft}:${POSTGRES_PASSWORD:-vitasoft}@postgres:5432/${POSTGRES_DB:-vitasoft}?schema=public
       REDIS_URL: redis://redis:6379
+      # Local-only secret; prod injects a real one from Secret Manager.
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-only-change-me-0123456789abcdef0123456789abcdef}
     ports:
       - "3001:3001"
     depends_on:

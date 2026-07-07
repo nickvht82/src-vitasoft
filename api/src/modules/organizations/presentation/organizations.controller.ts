@@ -7,10 +7,17 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
   UsePipes,
 } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import { AuthGuard } from "@vitasoft/auth";
 import { ZodValidationPipe } from "@vitasoft/http-kit";
 import { CreateOrganizationCommand } from "../application/commands/create-organization.command.js";
 import { GetOrganizationQuery } from "../application/queries/get-organization.query.js";
@@ -42,6 +49,8 @@ export class OrganizationsController {
 
   @Post()
   @HttpCode(201)
+  @UseGuards(AuthGuard)
+  @ApiCookieAuth()
   @ApiCreatedResponse({ description: "Organization created." })
   @UsePipes(new ZodValidationPipe(createOrganizationSchema))
   async create(

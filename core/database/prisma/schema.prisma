@@ -2,6 +2,11 @@
 // Source of truth for the relational data model used by @vitasoft/api and
 // every product backend. Multi-tenancy is modelled with `organizationId` as
 // the tenant key on business tables (see ARCHITECTURE.md §5.2).
+//
+// Auth tables (user/session/account/verification + organization/member/
+// invitation) follow the better-auth 1.6 canonical schema so the Prisma adapter
+// maps cleanly. They are merged with the pre-existing Organization/User models
+// (increment 1) rather than duplicated.
 
 generator client {
   provider = "prisma-client"
@@ -13,27 +18,134 @@ datasource db {
 }
 
 /// A tenant. Every business record hangs off exactly one organization.
+/// Also serves as better-auth's `organization` table (org plugin): `slug`,
+/// `name`, `logo`, `metadata` are the fields better-auth expects.
 model Organization {
   id        String   @id @default(cuid())
   slug      String   @unique
   name      String
+  logo      String?
+  metadata  String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  users User[]
+  users       User[]
+  members     Member[]
+  invitations Invitation[]
 
   @@map("organizations")
 }
 
-/// Minimal user model — the tenant key `organizationId` is present from day one
-/// so multi-tenant scoping works before the auth module lands (increment 2).
+/// Application user (better-auth canonical `user` fields). `organizationId` is
+/// the user's home tenant — **nullable** because better-auth creates the user at
+/// sign-up, before any organization exists; it is set when the user creates or
+/// joins their first org. Membership + roles live in the `Member` join table.
 model User {
   id             String   @id @default(cuid())
   email          String   @unique
-  organizationId String
+  name           String   @default("")
+  emailVerified  Boolean  @default(false)
+  image          String?
+  organizationId String?
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  sessions     Session[]
+  accounts     Account[]
+  members      Member[]
+  invitations  Invitation[] @relation("InvitedBy")
 
   @@index([organizationId])
   @@map("users")
+}
+
+/// better-auth session. Cookie-backed, validated server-side on every request.
+model Session {
+  id                   String   @id @default(cuid())
+  userId               String
+  token                String   @unique
+  expiresAt            DateTime
+  ipAddress            String?
+  userAgent            String?
+  activeOrganizationId String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// better-auth account — holds the password hash for email/password auth and
+/// (later) OAuth provider linkages.
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+/// better-auth verification tokens (email verification, password reset).
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+/// better-auth organization plugin: a user's membership + role in an org.
+/// `role` is one of the Vitasoft roles (admin | operator | member).
+model Member {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String   @default("member")
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("members")
+}
+
+/// better-auth organization plugin: a pending invitation to join an org.
+model Invitation {
+  id             String   @id @default(cuid())
+  email          String
+  inviterId      String
+  organizationId String
+  role           String   @default("member")
+  status         String   @default("pending")
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  inviter      User         @relation("InvitedBy", fields: [inviterId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitations")
 }

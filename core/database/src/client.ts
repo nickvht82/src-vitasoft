@@ -6,10 +6,13 @@ import { PrismaClient } from "./generated/client/client.js";
  */
 export interface PrismaClientOptions {
   /**
-   * Postgres connection string. Falls back to `process.env.DATABASE_URL`.
-   * Passing it explicitly keeps the factory pure and easy to test.
+   * Postgres connection string. **Required** — callers must pass a value that
+   * has already been validated (e.g. via `@vitasoft/config` `loadEnv()`). The
+   * factory does not read `process.env` so that a missing/invalid `DATABASE_URL`
+   * fails fast at the config boundary rather than surfacing as a runtime query
+   * error deep inside a request (see QA finding F-01).
    */
-  readonly datasourceUrl?: string;
+  readonly datasourceUrl: string;
   /** Prisma log levels to emit. Defaults to warnings and errors only. */
   readonly log?: readonly ("query" | "info" | "warn" | "error")[];
 }
@@ -20,14 +23,21 @@ export interface PrismaClientOptions {
  * factory exists so tests can spin up an isolated client without touching the
  * process-wide singleton.
  *
- * @param options - Connection and logging overrides.
+ * @param options - Connection string (required) and logging overrides.
  * @returns A newly constructed, not-yet-connected Prisma client.
+ * @throws Error when `datasourceUrl` is empty — fail fast instead of silently
+ *   constructing a client that can never connect.
  */
 export function createPrismaClient(
-  options: PrismaClientOptions = {},
+  options: PrismaClientOptions,
 ): PrismaClient {
-  const connectionString =
-    options.datasourceUrl ?? process.env.DATABASE_URL ?? "";
+  const connectionString = options.datasourceUrl;
+  if (!connectionString) {
+    throw new Error(
+      "createPrismaClient requires a non-empty datasourceUrl. Pass a validated " +
+        "DATABASE_URL from @vitasoft/config loadEnv().",
+    );
+  }
   const adapter = new PrismaPg({ connectionString });
   return new PrismaClient({
     adapter,
@@ -51,14 +61,24 @@ type GlobalWithPrisma = typeof globalThis & {
  * A single client (and therefore a single connection pool) per process is the
  * Prisma-recommended pattern — constructing many clients exhausts DB connections.
  *
- * @param options - Applied only when the singleton is created the first time.
+ * @param options - Connection string (required) applied only when the singleton
+ *   is created the first time. Subsequent calls ignore it and return the cache.
  * @returns The shared Prisma client.
+ * @throws Error when the singleton does not yet exist and `datasourceUrl` is empty.
  */
-export function getPrismaClient(options?: PrismaClientOptions): PrismaClient {
+export function getPrismaClient(options: PrismaClientOptions): PrismaClient {
   const globalRef = globalThis as GlobalWithPrisma;
   globalRef[SINGLETON_KEY] ??= createPrismaClient(options);
   return globalRef[SINGLETON_KEY];
 }
 
 export { PrismaClient };
-export type { Organization, User } from "./generated/client/client.js";
+export type {
+  Account,
+  Invitation,
+  Member,
+  Organization,
+  Session,
+  User,
+  Verification,
+} from "./generated/client/client.js";

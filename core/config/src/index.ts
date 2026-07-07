@@ -15,6 +15,14 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
   REDIS_URL: z.string().url().optional(),
 
+  // Auth — better-auth session signing secret (optional until a service enables
+  // auth; the API enforces it at its own boundary). Min length mirrors
+  // better-auth's requirement so a too-short secret fails fast here.
+  BETTER_AUTH_SECRET: z.string().min(32).optional(),
+
+  // OpenTelemetry — OTLP endpoint; unset means log spans to console (no crash).
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+
   // AI — resolved by the Anthropic SDK from env or `ant auth login` profile
   ANTHROPIC_API_KEY: z.string().optional(),
 });

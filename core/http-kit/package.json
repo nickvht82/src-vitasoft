@@ -26,8 +26,8 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@nestjs/common": "11.1.27",
-    "@nestjs/core": "11.1.27",
+    "@nestjs/common": "11.1.28",
+    "@nestjs/core": "11.1.28",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "4.1.10",
     "reflect-metadata": "0.2.2",

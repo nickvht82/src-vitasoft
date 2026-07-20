@@ -33,7 +33,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "^5.7.2",
     "unplugin-swc": "1.5.9",
-    "@swc/core": "1.15.43",
+    "@swc/core": "1.15.46",
     "vitest": "4.1.10"
   }
 }

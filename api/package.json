@@ -35,7 +35,7 @@
   "devDependencies": {
     "@nestjs/testing": "11.1.28",
     "@swc/core": "1.15.46",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.1.1",
     "@vitest/coverage-v8": "4.1.10",
     "typescript": "^5.7.2",
     "unplugin-swc": "1.5.9",

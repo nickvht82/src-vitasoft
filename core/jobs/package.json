@@ -20,7 +20,7 @@
     "bullmq": "5.80.9"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.1.1",
     "@vitest/coverage-v8": "4.1.10",
     "typescript": "^5.7.2",
     "vitest": "4.1.10"

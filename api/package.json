@@ -37,7 +37,7 @@
     "@swc/core": "1.15.46",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "4.1.10",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "unplugin-swc": "1.5.9",
     "vitest": "4.1.10"
   }

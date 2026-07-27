@@ -17,7 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "bullmq": "5.80.9"
+    "bullmq": "5.81.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

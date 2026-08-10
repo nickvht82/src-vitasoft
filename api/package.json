@@ -25,8 +25,8 @@
     "@vitasoft/jobs": "workspace:*",
     "@vitasoft/logger": "workspace:*",
     "@vitasoft/observability": "workspace:*",
-    "better-auth": "1.6.25",
-    "fastify": "5.11.0",
+    "better-auth": "1.6.26",
+    "fastify": "5.11.2",
     "nestjs-cls": "6.2.1",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
@@ -38,7 +38,7 @@
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "4.1.10",
     "typescript": "^5.7.2",
-    "unplugin-swc": "1.5.9",
+    "unplugin-swc": "1.5.10",
     "vitest": "4.1.10"
   }
 }

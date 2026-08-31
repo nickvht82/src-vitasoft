@@ -25,9 +25,9 @@
     "@vitasoft/jobs": "workspace:*",
     "@vitasoft/logger": "workspace:*",
     "@vitasoft/observability": "workspace:*",
-    "better-auth": "1.7.1",
+    "better-auth": "1.7.2",
     "fastify": "5.12.1",
-    "nestjs-cls": "6.2.1",
+    "nestjs-cls": "6.2.2",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
     "zod": "4.4.3"

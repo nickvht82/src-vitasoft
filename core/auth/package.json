@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@vitasoft/database": "workspace:*",
-    "better-auth": "1.7.1"
+    "better-auth": "1.7.2"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.0",
